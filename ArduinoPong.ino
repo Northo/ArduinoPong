@@ -38,6 +38,7 @@ const int HEIGHT = 31;
 * PONG *
 *******/
 float BALL_SPEED = 1;
+int POINTS_TO_WIN = 11;
 
 // NB. Initial pos 0 and positive velocity will fuck it up
 // (No way that it can reach the state x=0, vx>0, so this is an impossible initial state).
@@ -54,12 +55,18 @@ int bar2_x = 30;
 
 int bar_height = 2;
 
-int k=0;
-int l=0;
+int points_1 = 0;
+int points_2 = 0;
 
 void control_bar(float &bar) {
   bar = min(HEIGHT-bar_height, bar);
   bar = max(bar_height, bar);
+}
+
+void game_won() {
+  matrix.fillScreen(matrix.Color333(0, 0, 0));
+  matrix.print("Game over!");
+  delay(3000);
 }
 
 void reset() {
@@ -77,7 +84,6 @@ void reset() {
   vy *= signy;
   draw();
   delay(400);
-
 }
 
 void draw() {
@@ -90,11 +96,9 @@ void draw() {
   matrix.setCursor(10, 0);
   matrix.setTextSize(0.5);
   matrix.setTextColor(matrix.Color333(0,7,0));
-  matrix.print(k);
-
+  matrix.print(points_1);
   matrix.setCursor(20, 0);   // start at top left, with one pixel of spacing
-  matrix.setTextColor(matrix.Color333(0,7,0));
-  matrix.print(l);
+  matrix.print(points_2);
 
 }
 
@@ -131,40 +135,30 @@ void pong() {
       vx = -abs(vx);
     }
 
-    // Check collision with wall
-    if (x <= 0){
-      vx = -vx;
-      k++;
-     // start at top left, with one pixel of spacing
-      delay(100);
-      reset();
-      /*matrix.print("Lost!");
-      vx = 0;
-      vy = 0;
-      while (true){}*/
-    }
-    if(x >= WIDTH){
-      vx=-vx;
-      l++;
-      delay(100);
-      reset();
-      }
+    // Check collison with top or bottom wall, reflect ball
     if (y <= 0 or y >= HEIGHT) {
       vy = -vy;
     }
 
+    // Check collision with end walls, add points
+    if (x <= 0){
+      points_2++;
+      reset();
+    }
+    if(x >= WIDTH){
+      points_1++;
+      reset();
+    }
+
     x += vx;
     y += vy;
-    delay(rate);
 
-    if(k==11 or l==11){
-      matrix.fillScreen(matrix.Color333(5, 0, 0));
-      matrix.setCursor(10, 15);
-      matrix.setTextSize(0.5);
-      matrix.setTextColor(matrix.Color333(0,7,0));
-      matrix.print('GAME OVER');
-      delay(10000);
+    if(points_1==POINTS_TO_WIN or points_2==POINTS_TO_WIN){
+      game_won();
+      break;
     }
+
+    delay(rate);
   }
 }
 
