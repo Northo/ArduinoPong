@@ -186,5 +186,12 @@ void setup() {
 }
 
 void loop() {
+  matrix.fillScreen(0);
+  matrix.setCursor(6, 0);
+  matrix.print("Menu");
+
+  matrix.fillRect(6, 15, 4, 4, matrix.Color333(4,4,4));
+  matrix.fillCircle(20, 15, 3, matrix.Color333(4,4,4));
+  delay(3000);
   pong();
 }
