@@ -38,7 +38,7 @@ const int HEIGHT = 31;
 * PONG *
 *******/
 float BALL_SPEED = 1;
-int POINTS_TO_WIN = 11;
+int POINTS_TO_WIN = 3;
 
 // NB. Initial pos 0 and positive velocity will fuck it up
 // (No way that it can reach the state x=0, vx>0, so this is an impossible initial state).
@@ -58,13 +58,31 @@ int bar_height = 2;
 int points_1 = 0;
 int points_2 = 0;
 
+void reset_pong() {
+  reset();
+
+  bar1 = 16;
+  bar2 = 16;
+
+  points_1 = 0;
+  points_2 = 0;
+}
+
 void control_bar(float &bar) {
   bar = min(HEIGHT-bar_height, bar);
   bar = max(bar_height, bar);
 }
 
 void game_won() {
-  matrix.fillScreen(matrix.Color333(0, 0, 0));
+  matrix.fillScreen(0);
+  for (int i = 0; i < WIDTH/2; i++) {
+    matrix.fillCircle(WIDTH/2, HEIGHT/2, i, matrix.Color333(7,0,0));
+    delay(50);
+  }
+  
+  matrix.setCursor(3, 6);
+  matrix.setTextSize(0.5);
+  matrix.setTextColor(matrix.Color333(7,7,7));
   matrix.print("Game over!");
   delay(3000);
 }
@@ -83,7 +101,6 @@ void reset() {
   vx *= signx;
   vy *= signy;
   draw();
-  delay(400);
 }
 
 void draw() {
@@ -103,6 +120,7 @@ void draw() {
 }
 
 void pong() {
+  reset_pong();
   while(true) {
     /***********
      * Measure *
@@ -144,6 +162,7 @@ void pong() {
     if (x <= 0){
       points_2++;
       reset();
+      delay(400);
     }
     if(x >= WIDTH){
       points_1++;
