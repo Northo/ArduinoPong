@@ -34,12 +34,14 @@ int rate = 50;
 const int WIDTH = 31;
 const int HEIGHT = 31; 
 
+float BALL_SPEED = 1;
+
 // NB. Initial pos 0 and positive velocity will fuck it up
 // (No way that it can reach the state x=0, vx>0, so this is an impossible initial state).
 float x = 1;
 float y = 1;
-float vx = 0.9;
-float vy = 0.2;
+float vx = sin(1)*BALL_SPEED;
+float vy = cos(1)*BALL_SPEED;
 
 float bar1 = 16;
 float bar2 = 16;
@@ -61,6 +63,34 @@ void control_bar(float &bar) {
   bar = max(bar_height, bar);
 }
 
+void reset() {  
+  // Resets game
+  x = int(WIDTH/2);
+  y = int(HEIGHT/2);
+  float dir = (float)random(100);
+  vx = sin(dir)*BALL_SPEED;
+  vy = cos(dir)*BALL_SPEED;
+  draw();
+  delay(400);
+}
+
+void draw() {
+  
+  matrix.fillScreen(matrix.Color333(0, 0, 0));
+  matrix.drawPixel((int) x, (int) y, matrix.Color333(4, 0, 0));
+  matrix.drawLine(bar1_x, int(bar1) - bar_height, bar1_x, int(bar1) + bar_height, matrix.Color333(4, 4, 4));
+  matrix.drawLine(bar2_x, int(bar2) - bar_height, bar2_x, int(bar2) + bar_height, matrix.Color333(4, 4, 4));
+ 
+  matrix.setCursor(10, 0);
+  matrix.setTextSize(0.5); 
+  matrix.setTextColor(matrix.Color333(0,7,0));  
+  matrix.print(k);
+
+  matrix.setCursor(20, 0);   // start at top left, with one pixel of spacing
+  matrix.setTextColor(matrix.Color333(0,7,0));  
+  matrix.print(l);
+  
+}
 void loop() {
   /***********
    * Measure *
@@ -73,29 +103,16 @@ void loop() {
   /********
    * Draw *
    ********/
-
-  matrix.fillScreen(matrix.Color333(0, 0, 0));
-  matrix.drawPixel((int) x, (int) y, matrix.Color333(4, 0, 0));
-  matrix.drawLine(bar1_x, int(bar1) - bar_height, bar1_x, int(bar1) + bar_height, matrix.Color333(4, 4, 4));
-  matrix.drawLine(bar2_x, int(bar2) - bar_height, bar2_x, int(bar2) + bar_height, matrix.Color333(4, 4, 4));
-  bar1 += (2.5 - voltage1)/3;
-  control_bar(bar1);
-  bar2 += (2.5 - voltage2)/3;
-  control_bar(bar2);
-
- 
-  matrix.setCursor(10, 0);
-  matrix.setTextSize(0.5); 
-  matrix.setTextColor(matrix.Color333(0,7,0));  
-  matrix.print(k);
-
-  matrix.setCursor(20, 0);   // start at top left, with one pixel of spacing
-  matrix.setTextColor(matrix.Color333(0,7,0));  
-  matrix.print(l);
+  draw();
 
   /**************
    * Game logic *
    **************/
+
+  bar1 += (2.5 - voltage1)/3;
+  control_bar(bar1);
+  bar2 += (2.5 - voltage2)/3;
+  control_bar(bar2);
 
   // Check collision with bar
   if (int(x) <= bar1_x and bar1 + bar_height >= y and bar1 - bar_height <= y) {
@@ -112,6 +129,7 @@ void loop() {
     k++;
    // start at top left, with one pixel of spacing
     delay(100);
+    reset();
     /*matrix.print("Lost!");
     vx = 0;
     vy = 0;
@@ -121,6 +139,7 @@ void loop() {
     vx=-vx;
     l++;
     delay(100);
+    reset();
     }
   if (y <= 0 or y >= HEIGHT) {
     vy = -vy;
