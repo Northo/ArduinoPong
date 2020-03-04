@@ -32,8 +32,11 @@ RGBmatrixPanel matrix(A, B, C, D, CLK, LAT, OE, false);
 
 int rate = 50;
 const int WIDTH = 31;
-const int HEIGHT = 31; 
+const int HEIGHT = 31;
 
+/*******
+* PONG *
+*******/
 float BALL_SPEED = 1;
 
 // NB. Initial pos 0 and positive velocity will fuck it up
@@ -54,16 +57,12 @@ int bar_height = 2;
 int k=0;
 int l=0;
 
-void setup() {
-  matrix.begin();
-}
-
 void control_bar(float &bar) {
   bar = min(HEIGHT-bar_height, bar);
   bar = max(bar_height, bar);
 }
 
-void reset() {  
+void reset() {
   // Resets game
   x = int(WIDTH/2);
   y = int(HEIGHT/2);
@@ -75,86 +74,97 @@ void reset() {
 }
 
 void draw() {
-  
+
   matrix.fillScreen(matrix.Color333(0, 0, 0));
   matrix.drawPixel((int) x, (int) y, matrix.Color333(4, 0, 0));
   matrix.drawLine(bar1_x, int(bar1) - bar_height, bar1_x, int(bar1) + bar_height, matrix.Color333(4, 4, 4));
   matrix.drawLine(bar2_x, int(bar2) - bar_height, bar2_x, int(bar2) + bar_height, matrix.Color333(4, 4, 4));
- 
+
   matrix.setCursor(10, 0);
-  matrix.setTextSize(0.5); 
-  matrix.setTextColor(matrix.Color333(0,7,0));  
+  matrix.setTextSize(0.5);
+  matrix.setTextColor(matrix.Color333(0,7,0));
   matrix.print(k);
 
   matrix.setCursor(20, 0);   // start at top left, with one pixel of spacing
-  matrix.setTextColor(matrix.Color333(0,7,0));  
+  matrix.setTextColor(matrix.Color333(0,7,0));
   matrix.print(l);
-  
+
 }
-void loop() {
-  /***********
-   * Measure *
-   ***********/
-  int sensorValue1 = analogRead(A4);
-  int sensorValue2 = analogRead(A5);
-  float voltage1 = sensorValue1 * (5.0 / 1023.0);
-  float voltage2 = sensorValue2 * (5.0 / 1023.0);
 
-  /********
-   * Draw *
-   ********/
-  draw();
+void pong() {
+  while(true) {
+    /***********
+     * Measure *
+     ***********/
+    int sensorValue1 = analogRead(A4);
+    int sensorValue2 = analogRead(A5);
+    float voltage1 = sensorValue1 * (5.0 / 1023.0);
+    float voltage2 = sensorValue2 * (5.0 / 1023.0);
 
-  /**************
-   * Game logic *
-   **************/
+    /********
+     * Draw *
+     ********/
+    draw();
 
-  bar1 += (2.5 - voltage1)/3;
-  control_bar(bar1);
-  bar2 += (2.5 - voltage2)/3;
-  control_bar(bar2);
+    /**************
+     * Game logic *
+     **************/
 
-  // Check collision with bar
-  if (int(x) <= bar1_x and bar1 + bar_height >= y and bar1 - bar_height <= y) {
-    vx = abs(vx);
-  }
+    bar1 += (2.5 - voltage1)/3;
+    control_bar(bar1);
+    bar2 += (2.5 - voltage2)/3;
+    control_bar(bar2);
 
-  if (int(x) >= bar2_x and bar2 + bar_height >= y and bar2 - bar_height <= y) {
-    vx = -abs(vx);
-  }
-
-  // Check collision with wall
-  if (x <= 0){
-    vx = -vx;
-    k++;
-   // start at top left, with one pixel of spacing
-    delay(100);
-    reset();
-    /*matrix.print("Lost!");
-    vx = 0;
-    vy = 0;
-    while (true){}*/
-  }
-  if(x >= WIDTH){
-    vx=-vx;
-    l++;
-    delay(100);
-    reset();
+    // Check collision with bar
+    if (int(x) <= bar1_x and bar1 + bar_height >= y and bar1 - bar_height <= y) {
+      vx = abs(vx);
     }
-  if (y <= 0 or y >= HEIGHT) {
-    vy = -vy;
-  }
 
-  x += vx;
-  y += vy;
-  delay(rate);
+    if (int(x) >= bar2_x and bar2 + bar_height >= y and bar2 - bar_height <= y) {
+      vx = -abs(vx);
+    }
 
-  if(k==11 or l==11){
-    matrix.fillScreen(matrix.Color333(5, 0, 0));
-    matrix.setCursor(10, 15);
-    matrix.setTextSize(0.5); 
-    matrix.setTextColor(matrix.Color333(0,7,0));  
-    matrix.print('GAME OVER');
-    delay(10000);
+    // Check collision with wall
+    if (x <= 0){
+      vx = -vx;
+      k++;
+     // start at top left, with one pixel of spacing
+      delay(100);
+      reset();
+      /*matrix.print("Lost!");
+      vx = 0;
+      vy = 0;
+      while (true){}*/
+    }
+    if(x >= WIDTH){
+      vx=-vx;
+      l++;
+      delay(100);
+      reset();
+      }
+    if (y <= 0 or y >= HEIGHT) {
+      vy = -vy;
+    }
+
+    x += vx;
+    y += vy;
+    delay(rate);
+
+    if(k==11 or l==11){
+      matrix.fillScreen(matrix.Color333(5, 0, 0));
+      matrix.setCursor(10, 15);
+      matrix.setTextSize(0.5);
+      matrix.setTextColor(matrix.Color333(0,7,0));
+      matrix.print('GAME OVER');
+      delay(10000);
+    }
   }
+}
+
+void setup() {
+  matrix.begin();
+}
+
+void loop() {
+  pong();
 }
