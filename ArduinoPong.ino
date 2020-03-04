@@ -189,12 +189,20 @@ void setup() {
 }
 
 void loop() {
+  while(true){
   matrix.fillScreen(0);
-  matrix.setCursor(6, 0);
+  matrix.setCursor(6, 2);
   matrix.print("Menu");
-
-  matrix.fillRect(6, 15, 4, 4, matrix.Color333(4,4,4));
-  matrix.fillCircle(20, 15, 3, matrix.Color333(4,4,4));
-  delay(3000);
-  pong();
-}
+  matrix.fillRect(6, 15, 9, 9, matrix.Color333(4,4,4));
+  matrix.fillRect(19, 15, 9, 9, matrix.Color333(4,4,4));
+  matrix.fillCircle(10, 19, 2, matrix.Color333(7,0,0));
+  matrix.drawLine(20, 22, 25, 16, matrix.Color333(0, 7, 0));
+  matrix.drawPixel(26, 16, matrix.Color333(7, 0, 0));
+  int x = analogRead(A4)* (5.0 / 1023.0)*6;
+  int y = analogRead(A5)* (5.0 / 1023.0)*6;
+  matrix.fillCircle(x, y, 1, matrix.Color333(0,0,7));
+  delay(5000);
+  if(6<x<15){
+  pong();}
+  delay(40);
+}}
