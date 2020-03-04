@@ -39,6 +39,7 @@ const int HEIGHT = 31;
 *******/
 float BALL_SPEED = 1;
 int POINTS_TO_WIN = 3;
+float BAR_SPEED = 1.8;
 
 // NB. Initial pos 0 and positive velocity will fuck it up
 // (No way that it can reach the state x=0, vx>0, so this is an impossible initial state).
@@ -139,9 +140,11 @@ void pong() {
      * Game logic *
      **************/
 
-    bar1 += (2.5 - voltage1)/3;
+    float delta_bar1 = (2.5 - voltage1)/2.5;
+    float delta_bar2 = (2.5 - voltage2)/2.5;
+    bar1 += abs(delta_bar1)<0.3 ? 0 : delta_bar1*BAR_SPEED;
+    bar2 += abs(delta_bar2)<0.3 ? 0 : delta_bar2*BAR_SPEED;
     control_bar(bar1);
-    bar2 += (2.5 - voltage2)/3;
     control_bar(bar2);
 
     // Check collision with bar
