@@ -64,13 +64,20 @@ void control_bar(float &bar) {
 
 void reset() {
   // Resets game
+  // Sets balls velocity in x-direction
+  // to between 50 and 100 percent of BALL_SPEED
+  // sets y to be such that total speed is BALL_SPEED
   x = int(WIDTH/2);
   y = int(HEIGHT/2);
-  float dir = (float)random(100);
-  vx = sin(dir)*BALL_SPEED;
-  vy = cos(dir)*BALL_SPEED;
+  vx = random(50, 100)*BALL_SPEED/100.0;
+  vy = sqrt(sq(BALL_SPEED)-sq(vx));
+  int signx = random(-10, 10) > 0? -1 : 1;
+  int signy = random(-10, 10) > 0? -1 : 1;
+  vx *= signx;
+  vy *= signy;
   draw();
   delay(400);
+
 }
 
 void draw() {
